@@ -1,22 +1,25 @@
 package com.example.moham.bathroom;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
+import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
-import android.net.ConnectivityManager;
-import android.content.Context;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,6 +44,9 @@ public class MapsActivity extends FragmentActivity implements
     private Marker currentUserLocationMarker;
     private static final int Request_User_Location_Code = 99;
 
+    //Used for location button. Check in onMapReady() method
+    private View mapView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,10 +63,9 @@ public class MapsActivity extends FragmentActivity implements
             checkUserLocationPermission();
         }
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapView = mapFragment.getView();
         mapFragment.getMapAsync(this);
-
     }
 
     /**
@@ -79,8 +84,6 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-
 
         LatLng NYC = new LatLng(40.737481, -74.005634);
         LatLng BP_Bronx = new LatLng(40.847189, -73.901090);
@@ -104,6 +107,23 @@ public class MapsActivity extends FragmentActivity implements
             buildGoogleApiClient();
 
             mMap.setMyLocationEnabled(true);
+
+            System.out.println("Test1");
+
+            //Used to change current location button position
+            if (mapView != null && mapView.findViewById(Integer.parseInt("1")) != null) {
+                System.out.println("Test2");
+                // Get the button view
+                View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+                // and next place it, on bottom right (as Google Maps app)
+                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
+                        locationButton.getLayoutParams();
+                // position on right bottom
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                layoutParams.setMargins(0, 0, 30, 200);
+            }
+
         }
     }
 
